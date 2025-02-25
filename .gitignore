@@ -172,3 +172,7 @@ cython_debug/
 .pypirc
 
 test.py
+login.py
+register.py
+report.py
+purchase.py
