@@ -1,12 +1,12 @@
 """Amazon Expenses Tracker"""
 
 import getpass
-
 import datetime
 import re
+import time
 
 print("Good day, please register your account on our Website")
-user = input("Please enter your username: ")
+username = input("Please enter your username: ")
 
 def pw_valid_check(password):
     if not (6 <= len(password) <= 20):
@@ -36,27 +36,52 @@ def pw_register():
         
 password = pw_register()
 
-# TODO phone number register
+def register_number():
+    while True:
+        user_input = input("Please enter your German mobile number (starting with +49, followed by 10 digits): ")
 
-# TODO 5 sec delay and ask for register again if wrong after that
-# def login():
-#     usercheck = input("Please enter your registered username: ")
-#     pwcheck = getpass.getpass("Please enter your registered password")
-#     attempts = 0
-#     while usercheck != user or pwcheck != password:
-#         attempts += 1
-#         usercheck = input("Please enter your registered username: ")
-#         pwcheck = getpass.getpass("Please enter your registered password")
-#         if attempts == 3:
-#             sleep(5)
-#         if attempts == 4:
-#             exit()
-#         else:
-#             print("Login successful")
-#             print("Welcome to the Amazon Expense Tracker!")
+        if re.match(r"^(?:\+49|0)[1-9]\d{10,14}$", user_input):
+            print("Valid German mobile number entered!")
+            return user_input
+        else:
+            print("Invalid number. Please try again.")
+            
+register_number()
 
-        
-# login()
+def login():
+    attempts = 0
+
+    while attempts < 3:
+        check_username = input("Enter your username: ")
+        check_password = getpass.getpass("Enter your password: ")
+
+        # Check if the username and password match
+        if check_username == username and check_password == password:
+            print("Login successful!")
+            return True
+        else:
+            print("Invalid username or password. Please try again.")
+            attempts += 1
+
+    # 5 Sec delay, print something about all attempts used.
+    print("You have used all your attempts. Please try again in 5 seconds.")
+    time.sleep(5)
+
+    # Last chance to login
+    check_username = input("Enter your username: ")
+    check_password = input("Enter your password: ")
+
+    if username == check_username and password == check_password:
+        print("Login successful!")
+        return True
+    else:
+        print("Invalid username or password. Please register again.")
+        return False
+    
+if not login():
+    exit()
+    
+print("Welcome to the Amazon Expense Tracker!")
 
 def purchase_date_formator():
     date_input = input("Enter the date of the purchase (MM/DD/YYYY or MM-DD-YYYY): ")
@@ -82,14 +107,18 @@ def purchase_date_formator():
     print("Invalid date format. Please use MM/DD/YYYY or MM-DD-YYYY.")
     return purchase_date_formator()
                 
-
-def collect_info_purchase():
+def choices():
     print("What do you want to do?")
     print("1. Enter a purchase")
     print("2. Generate a report")
     print("3. Quit.")
     choice = int(input("Enter your choice (1-3): "))
+    return choice
+    
+def collect_info_purchase():
+    choice = choices()
     while choice >= 4 and choice == 0:
+        print("Invalid number, please enter a number between 1-3.")
         choice = int(input("Enter your choice (1-3): "))
     else:
         pass        
@@ -129,22 +158,17 @@ def collect_info_purchase():
         kg_pattern = "kg$"
         checked_weight = check_pattern(weight_check, kg_pattern)
         weight = weight_check.replace("kg", "", 1).strip()
-
         while checked_weight != True or not weight.replace('.', '', 1).isdigit() or '.' not in weight:
             print("Please make sure that the weight entered is a float and includes kg at the end!")
             weight_check = input("Please enter the total weight of the item in kg: ")
             checked_weight = check_pattern(weight_check, kg_pattern)
             weight = weight_check.replace("kg", "", 1).strip()
-
         else:
             print(f"Thank you, your weight has been noted as {weight_check}.")
-        
         print("The last thing we need to note your purchase is the quantity. \nHow many times did you purchase this item?")
         quantity = input("Please enter your number here: ")
-
         while not quantity.isdigit() or int(quantity) <= 0:
             quantity = input("Please enter your number here (needs to be higher than 0): ")
-
         quantity = int(quantity)
         print(f"Thank you, we noted the quantity as {quantity}.")
     if choice == 2:
@@ -156,8 +180,6 @@ def collect_info_purchase():
 
 collect_info_purchase()
 
-
-    # TODO German Phone number register
-    # TODO LOGIN
     # TODO put everything into a list/dict from choice 1
+    # TODO allow choice 2 only if choice 1 was used once
     # TODO calculate everything if choice 2.
